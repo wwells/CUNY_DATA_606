@@ -313,7 +313,7 @@ We can see from the above table that the counts between the two data sets are qu
 
 ```{r, comment=NA}
 present$total <- present$boys + present$girls
-plot(present$year, present$boys/present$total, xlab="Year", ylab="Ratio of Boys to Girls", main="Ratio of Boy to Girl Births, 1940-2002")
+plot(present$year, present$boys/present$girls, xlab="Year", ylab="Ratio of Boys to Girls", main="Ratio of Boy to Girl Births, 1940-2002")
 sum(present$girls > present$boys)
 ```
 

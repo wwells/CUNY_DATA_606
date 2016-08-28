@@ -1,6 +1,12 @@
 ---
 title: "DATA 606 - Lab0: Introduction to R and RStudio"
 author: "Walt Wells, Fall 2016"
+output:
+  html_document:
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+  pdf_document: default
 ---
 
 ```{r}

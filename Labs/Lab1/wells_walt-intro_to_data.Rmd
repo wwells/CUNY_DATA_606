@@ -351,16 +351,40 @@ wdiff <- cdc$wtdesire - cdc$weight
 
 ```{r}
 summary(wdiff)
-boxplot(wdiff, main = "Desired Weight - Actual Weight")
+boxplot(wdiff, main = "Desired Weight - Actual Weight", ylim = c(-110, 90))
 ```
+
+NOTE:   Because of the many outliers in the wdiff vector, we are limiting the y axis so the visualization better describes the IQR and whiskers. Without taking this step, the IQR is too squashed to be visually usefull.
+
+Since the 3rd Quartile starts at 0 it suggests that ~75% of the sampled persons have a desired weight under their current weight.  Both the Median and Mean suggest that these people feel like they are 10-15 lbs overweight.  
 
 #### Using numerical summaries and a side-by-side box plot, determine if men tend to view their weight differently than women.
 
 ```{r}
-boxplot(wdiff~cdc$gender, main="Desired Weight - Actual Weight by Gender")
+boxplot(wdiff~cdc$gender, main="Desired Weight - Actual Weight by Gender", ylim = c(-110, 90))
+
+cdc$wdiff <- wdiff
+## get sum stats
+summary(cdc$wdiff[which(cdc$gender == 'f')])
+sd(cdc$wdiff[which(cdc$gender == 'f')])
+summary(cdc$wdiff[which(cdc$gender == 'm')])
+sd(cdc$wdiff[which(cdc$gender == 'm')])
 ```
 
+From the summaries we can determine that while the 3rd Quartile range for both genders is ~0, the majority of the distribution shows greater variability for women, and the median wdiff for women is lower than men. 
+
 #### Now it's time to get creative. Find the mean and standard deviation of `weight` and determine what proportion of the weights are within one standard deviation of the mean.
+
+```{r}
+mu <- round(mean(cdc$weight), 2)
+sigma <- round(sd(cdc$weight), 2)
+OneSd <- subset(cdc, weight <= mu+sigma & weight >= mu-sigma)
+prop <- round(nrow(OneSd) / nrow(cdc), 2)
+```
+
+The mean of the weight variable is `r mu` and the standard deviation is `r sigma`. For a weight to fall within one sd of the mean, it needs to be in the interval [`r round(mu-sigma, 0)`, `r round(mu+sigma, 0)`].  We subset the data according this interval, and find the proportion by dividing the row length of this subset by the row length of the entire sample.  
+
+`r prop` is the proportion of the sample that have weights that fall within one standard deviation of the mean.  
 
 <div id="license">
 This is a product of OpenIntro that is released under a 

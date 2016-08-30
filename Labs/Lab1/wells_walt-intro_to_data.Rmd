@@ -1,5 +1,6 @@
 ---
 title: "Introduction to data"
+author: "Walt Wells, Fall 2016"
 output:
   html_document:
     theme: cerulean

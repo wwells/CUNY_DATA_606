@@ -1,0 +1,48 @@
+---
+title: "Week1HW: OpenIntro Statistics"
+author: "Walt Wells, Fall 2016"
+output:
+  html_document:
+    theme: cerulean
+    highlight: pygments
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Graded
+#### 1.8
+#### 1.10
+#### 1.28
+#### 1.36
+#### 1.48
+#### 1.50
+#### 1.56
+#### 1.70
+
+## Practice
+#### 1.7 (available in R using the data(iris) command)
+```{r}
+data("iris")
+```
+(a) How many cases were included in the data?
+```{r}
+dim(iris)
+```
+(b) How many numerical variables are included in the data? Indicate what they are, and if they are continuous or discrete.
+```{r}
+str(iris)
+```
+(c) How many categorical variables are included in the data, and what are they? List the corresponding levels (categories).
+
+- 3:  setosa, versicolor, virginica
+
+#### 1.9
+#### 1.23
+#### 1.33
+#### 1.55
+#### 1.69
+
+

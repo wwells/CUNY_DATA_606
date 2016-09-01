@@ -39,14 +39,14 @@ This returns the names `genhlth`, `exerany`, `hlthplan`, `smoke100`, `height`, `
 str(cdc)
 
 ## genhlth <- categorial, ordinal
-## exerany <- categorical, ordinal
-## hlthplan <- categorial, ordinal
-## smoke100 <- categorical, ordinal
+## exerany <- categorical, nominal
+## hlthplan <- categorial, nominal
+## smoke100 <- categorical, nominal
 ## height <- numerical, discrete
 ## weight <- numerical, discrete
 ## wtdesire <- numerical, discrete
 ## age <- numerical, discrete
-## gender <- categorical, ordinal
+## gender <- categorical, nominal
 ```
 
 We can have a look at the first few entries (rows) of our data with the command

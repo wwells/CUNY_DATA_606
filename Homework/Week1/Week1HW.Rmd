@@ -1,11 +1,11 @@
 ---
-title: "Week1HW: OpenIntro Statistics"
+title: 'Week1HW: OpenIntro Statistics'
 author: "Walt Wells, Fall 2016"
 output:
+  pdf_document: default
   html_document:
-    theme: cerulean
     highlight: pygments
-
+    theme: cerulean
 ---
 
 ```{r setup, include=FALSE}
@@ -28,7 +28,9 @@ str(smoking)
 #(b) How many participants were included in the survey?
 # 1691
 
-#(c) Indicate whether each variable in the study is numerical or categorical. If numerical, identify as continuous or discrete. If categorical, indicate if the variable is ordinal.
+#(c) Indicate whether each variable in the study is numerical or categorical.
+# If numerical, identify as continuous or discrete. If categorical, indicate if
+# the variable is ordinal.
 
 # gender <- categorical, nominal
 # age <- numerical, discrete
@@ -52,8 +54,19 @@ Exercise 1.5 introduces a study where researchers studying the relationship betw
 (b) Comment on whether or not the results of the study can be generalized to the population, and if the findings of the study can be used to establish causal relationships.
 
 ```{r}
-# a) The population of interest is children between the ages of 5 and 15.   The sample is 160 children in that age range.  
-# b) While this is an interesting study, it would be difficult to generalize to the target population without taking a few steps.   It is noted that the children were split into two groups but it doesn't say that this split was done randomly.   We don't know anything about the sampling method for finding these 160 children.   Blocking would likely be an effective technique, as surely a child aged 5 has a very different level of social intelligence than a child of 15.   We would also want a certain level of replication (whether through a larger sample or a repeated experiment).  Without more of these principles considered, it would be difficult to generalize.  Since the design of the study is experimental, it could be used to assume causal relationships. 
+# a) The population of interest is children between the ages of 5 and 15.   
+# The sample is 160 children in that age range.  
+# b) While this is an interesting study, it would be difficult to generalize to
+# the target population without taking a few steps.   It is noted that the 
+# children were split into two groups but it doesn't say that this split was
+# done randomly.   We don't know anything about the sampling method for finding
+# these 160 children.   Blocking would likely be an effective technique, as
+# surely a child aged 5 has a very different level of social intelligence than
+# a child of 15.   We would also want a certain level of replication (whether
+# through a larger sample or a repeated experiment).  Without more of these
+# principles considered, it would be difficult to generalize.  Since the design
+# of the study is experimental, it could be used to assume causal
+# relationships. 
 ```
 
 #### 1.28 Reading the paper
@@ -65,7 +78,8 @@ Exercise 1.5 introduces a study where researchers studying the relationship betw
 Based on this study, can we conclude that smoking causes dementia later in life? Explain your reasoning.
 
 ```{r}
-# Since this is an observational study consisting of an exam and survey, we cannot attribute causation.   
+# Since this is an observational study consisting of an exam and survey, we
+# cannot attribute causation.   
 ```
 
 (b) Another article titled The School Bully Is Sleepy states the following:
@@ -75,7 +89,8 @@ Based on this study, can we conclude that smoking causes dementia later in life?
 A friend of yours who read the article says, “The study shows that sleep disorders lead to bullying in school children.” Is this statement justified? If not, how best can you describe the conclusion that can be drawn from this study?
 
 ```{r}
-# Again since this is an observational study it shows evidence of a relationship between sleep and bullying, but it cannot imply causation.  
+# Again since this is an observational study it shows evidence of a
+# relationship between sleep and bullying, but it cannot imply causation.  
 ```
 
 #### 1.36 Exercise and mental health
@@ -94,8 +109,16 @@ A researcher is interested in the effects of exercise on mental health and he pr
 # b) Treatment: exercise twice a week; Control:  Do note exercise
 # c) Yes - age group. 
 # d) No
-# e) Since this is an experiment, a causal relationship can be inferred from the outcome.   It would appear that good experimental design was used.   So long as the sample is sufficiently large and the sampling techniques ensured the sample is representative of the population, the results should be generalizeable. 
-# f) I would suggest that 2 times a week is not sufficient exercise to determine a link to mental health.   If this number were increased to 4 or 5, perhaps.   Exercise also comes in many forms.   It would be difficult to ensure that those in the control group did not get exercise in such a way as to potentially impact their mental health.
+# e) Since this is an experiment, a causal relationship can be inferred from
+# the outcome.   It would appear that good experimental design was used.   So
+# long as the sample is sufficiently large and the sampling techniques ensured
+# the sample is representative of the population, the results should be
+# generalizeable. 
+# f) I would suggest that 2 times a week is not sufficient exercise to
+# determine a link to mental health.   If this number were increased to 4 or 5,
+# perhaps.   Exercise also comes in many forms.   It would be difficult to
+# ensure that those in the control group did not get exercise in such a way as
+# to potentially impact their mental health.
 ```
 
 #### 1.48 Stats scores
@@ -126,25 +149,35 @@ For each of the following, state whether you expect the distribution to be symme
 (a) Housing prices in a country where 25% of the houses cost below $350,000, 50% of the houses cost below $450,000, 75% of the houses cost below $1,000,000 and there are a meaningful number of houses that cost more than $6,000,000.
 
 ```{r}
-# Distribution would be right skewed.   Median would be a better representation, and IQR would show where the majority of the data resides.  Since 75% of the houses < $1 mil, but a "meaningful number" are > $6 mil, these outliers would throw off mean and sd observations. 
+# Distribution would be right skewed.   Median would be a better
+# representation, and IQR would show where the majority of the data resides.
+# Since 75% of the houses < $1 mil, but a "meaningful number" are > $6 mil,
+# these outliers would throw off mean and sd observations. 
 ```
 
 (b) Housing prices in a country where 25% of the houses cost below $300,000, 50% of the houses cost below $600,000, 75% of the houses cost below $900,000 and very few houses that cost more than $1,200,000.
 
 ```{r}
-# Distribution:  symmetric.   Since there are few outliers, mean and SD should be robust enough.   
+# Distribution:  symmetric.   Since there are few outliers, mean and SD should
+# be robust enough.   
 ```
 
 (c) Number of alcoholic drinks consumed by college students in a given week. Assume that most of these students don’t drink since they are under 21 years old, and only a few drink excessively.
 
 ```{r}
-# Since there is a baseline of 0 drinks and some will drink excessively, the data will be skewed right.   Median and IQR will be the best measures of variability. 
+# Since there is a baseline of 0 drinks and some will drink excessively, the
+# data will be skewed right.   Median and IQR will be the best measures of
+# variability. 
 ```
 
 (d) Annual salaries of the employees at a Fortune 500 company where only a few high level executives earn much higher salaries than the all other employees.
 
 ```{r}
-# This is likely to be skewed right with a baseline > than 0.  The difference between middle of the distribution and the executives with the highest salaries will be much greater than the middle of the distribution and the employees with the lowest salaries.   Therefore, Median and IQR will be the most robust measures of variability.
+# This is likely to be skewed right with a baseline > than 0.  The difference
+# between middle of the distribution and the executives with the highest
+# salaries will be much greater than the middle of the distribution and the
+# employees with the lowest salaries.   Therefore, Median and IQR will be the
+# most robust measures of variability.
 ```
 
 #### 1.70 Heart transplants
@@ -156,19 +189,26 @@ The Stanford University Heart Transplant Study was conducted to determine whethe
 (a) Based on the mosaic plot, is survival independent of whether or not the patient got a transplant?  Explain your reasoning.
 
 ```{r}
-# The mosaic plot indicates that a greater proportion of the treatment group survived than the control group.  This suggests a dependant relationship between the transplant and survival. 
+# The mosaic plot indicates that a greater proportion of the treatment group
+# survived than the control group.  This suggests a dependant relationship
+# between the transplant and survival. 
 ```
 
 (b) What do the box plots below suggest about the efficacy (effectiveness) of the heart transplant treatment.
 
 ```{r}
-# The median of the treatment group is nearly 1 year while the control group is very very low.   Even the Q1 of the treatment group is higher than the Q3 of the control group, nevermind how much higher Q3 of the treatment group is.   The boxplots suggest that the transplant treatment is effective at buying the patient additional time.
+# The median of the treatment group is nearly 1 year while the control group is
+# very very low.   Even the Q1 of the treatment group is higher than the Q3 of
+# the control group, nevermind how much higher Q3 of the treatment group is.
+# The boxplots suggest that the transplant treatment is effective at buying the
+# patient additional time.
 ```
 
 (c) What proportion of patients in the treatment group and what proportion of patients in the control group died?
 
 ```{r}
-# Based on the mosaic plot, ~ 6/7 of the control group died as compared to 3/5 of the treatment group.
+# Based on the mosaic plot, ~ 6/7 of the control group died as compared to 3/5
+# of the treatment group.
 ```
 
 (d) One approach for investigating whether or not the treatment is effective is to use a randomization technique.
@@ -180,5 +220,8 @@ The Stanford University Heart Transplant Study was conducted to determine whethe
 ![](1.70b.png)
 
 ```{r}
-# We can see from the simulation results above that the difference in our original proportion (roughly 0.257) is very unique, suggesting that this did not occur by chance.   We can reject the null hypothesis, as there is strong evidence that the experimental heart transplant does increase lifespan.   
+# We can see from the simulation results above that the difference in our
+# original proportion (roughly 0.257) is very unique, suggesting that this did
+# not occur by chance.   We can reject the null hypothesis, as there is strong
+# evidence that the experimental heart transplant does increase lifespan.   
 ```

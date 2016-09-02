@@ -2,10 +2,11 @@
 title: "Introduction to data"
 author: "Walt Wells, Fall 2016"
 output:
+  pdf_document: default
   html_document:
-    theme: cerulean
-    highlight: pygments
     css: ./lab.css
+    highlight: pygments
+    theme: cerulean
 ---
 
 Some define Statistics as the field that focuses on turning information into knowledge.  The first step in that process is to summarize and describe the raw information - the data.  In this lab, you will gain insight into public health by generating simple graphical and numerical summaries of a data set collected by the Centers for Disease Control and Prevention (CDC).  As this is a large data set, along the way you'll also learn the indispensable skills of data processing and subsetting.
@@ -142,7 +143,8 @@ We could have accomplished this in two steps by saving the table in one line and
 3.  What does the mosaic plot reveal about smoking habits and gender?
 
 ```{r}
-## The mosaic plot reveals that the greatest proportion of individuals who have not smoked more than 100 cigarettes are females.
+# The mosaic plot reveals that the greatest proportion of individuals who 
+# have not smoked more than 100 cigarettes are females.
 ```
 
 ## Interlude: How R thinks about data
@@ -301,9 +303,16 @@ Notice that the first line above is just some arithmetic, but it's applied to al
 ```{r}
 boxplot(bmi ~ cdc$exerany)
 
-### Here we have plotted the relationship between BMI and respondants who said they had exercised at least once in the last month.  We might expect there to be a relationship between the two, but there are so many additional contributing factors involved (eg. recently started exercising because BMI was getting too high, etc), that this boxplot does not easily help us draw conclusions about a relationship between the two.   
+### Here we have plotted the relationship between BMI and respondants who 
+# said they had exercised at least once in the last month.  We might expect
+# there to be a relationship between the two, but there are so many additional
+# contributing factors involved (eg. recently started exercising because BMI
+# was getting too high, etc), that this boxplot does not easily help us draw
+# conclusions about a relationship between the two.   
 
-##We can say that while there appear to be greater outliers in the BMI of those who have exercised in the past month, the IQC seems to show considerably less variance and a lower median BMI.    
+### We can say that while there appear to be greater outliers in the BMI of
+# those who have exercised in the past month, the IQC seems to show
+# considerably less variance and a lower median BMI.    
 ```
 
 Finally, let's make some histograms. We can look at the histogram for the age of our respondents with the command

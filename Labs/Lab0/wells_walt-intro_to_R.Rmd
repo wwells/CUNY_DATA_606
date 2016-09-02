@@ -2,11 +2,11 @@
 title: "Introduction to R and RStudio"
 author: "Walt Wells, Fall 2016"
 output:
+  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
-  pdf_document: default
 ---
 
 The goal of this lab is to introduce you to R and RStudio, which you'll be using
@@ -243,7 +243,8 @@ the history tab in the upper right panel.  This will save you a lot of typing in
 the future.
 
 ```{r}
-plot(arbuthnot$year, arbuthnot$boys / (arbuthnot$boys + arbuthnot$girls), xlab="Year", ylab="Proportion of Boys")
+plot(arbuthnot$year, arbuthnot$boys / (arbuthnot$boys + arbuthnot$girls),
+     xlab="Year", ylab="Proportion of Boys")
 ```
 
 Finally, in addition to simple mathematical operators like subtraction and 
@@ -313,7 +314,9 @@ We can see from the above table that the counts between the two data sets are qu
 
 ```{r, comment=NA}
 present$total <- present$boys + present$girls
-plot(present$year, present$boys/present$girls, xlab="Year", ylab="Ratio of Boys to Girls", main="Ratio of Boy to Girl Births, 1940-2002")
+plot(present$year, present$boys/present$girls, xlab="Year", 
+     ylab="Ratio of Boys to Girls", main="Ratio of Boy to Girl Births,
+     1940-2002")
 sum(present$girls > present$boys)
 ```
 
@@ -327,7 +330,7 @@ maxyr <- present$year[(which(present$total==max(present$total)))]
 max <- max(present$total)                     
 ```
 
-We can see that the year with the maximum total births in the US was `r maxyr` with `r max` total births.
+We can see that the year with the maximum total births in the US was `r maxyr` with `r as.integer(max)` total births.
 
 
 These data come from a report by the Centers for Disease Control 

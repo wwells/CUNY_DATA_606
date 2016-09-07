@@ -2,11 +2,11 @@
 title: "Probability"
 author: "Walt Wells, Fall 2016"
 output:
+  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
-  pdf_document: default
 ---
 
 ## Hot Hands
@@ -106,7 +106,8 @@ discrete -- counts -- instead of continuous.
 
 ```{r}
 table(kobe_streak)
-## The distribution is skewed right, with a baseline of 0.  His longest streak of made baskets was 4.  
+## The distribution is skewed right, with a baseline of 0.  
+# His longest streak of made baskets was 4.  
 ```
 
 ## Compared to What?
@@ -212,7 +213,8 @@ chip that says "head"" is 20%, and "tail" is 80%.
     
 ```{r}
 table(sim_unfair_coin)
-## We used 'set.seed' to ensure the results were consistent each time the .Rmd was knit.   In our simulation, 18 heads, 82 tails. 
+## We used 'set.seed' to ensure the results were consistent each time 
+# the .Rmd was knit.   In our simulation, 18 heads, 82 tails. 
 ```
 
 In a sense, we've shrunken the size of the slip of paper that says "heads", 
@@ -301,8 +303,35 @@ Before creating simstreak2, we would guess that a new simulation would generally
 #### How does Kobe Bryant's distribution of streak lengths compare to the  distribution of streak lengths for the simulated shooter? Using this  comparison, do you have evidence that the hot hand model fits Kobe's shooting patterns? Explain.
 
 ```{r}
-x <- replicate(100, sample(outcomes, size = 133, replace = TRUE, prob=c(.45, .55)))
+# run simulation
+sim <- replicate(10000, calc_streak(sample(outcomes, size = 133, replace = TRUE, prob=c(.45, .55))))
+sim_means <- unlist(lapply(sim, mean))
+sim_sd <- unlist(lapply(sim, sd))
+df <- data.frame(sim_means, sim_sd)
+
+#calculate values
+simallmean <- round(mean(sim_means), 3)
+simallsd <- round(mean(sim_sd), 3)
+mean_kobe_streak <- round(mean(calc_streak(kobe$basket)), 3)
+sd_kobe_streak <- round(sd(calc_streak(kobe$basket)), 3)
+m <- ecdf(sim_means)
+s <- ecdf(sim_sd)
+
+#plot
+par(mfrow=c(1,2))
+hist(df$sim_means, main="Distribution of Simultation \n Streak Means")
+abline(v=mean_kobe_streak, col="red")
+hist(df$sim_sd, main="Distribution of Simultation \n Streak SD")
+abline(v=sd_kobe_streak, col="red")
 ```
+
+In order to determine whether the streakiness of Kobe's shooting performance is unusual, we'll run a simulation of a 133 shot series for a 45% shooter 10000 times, and record a summary stat for each series - the Mean and SD of each streak.  We can see in the above histogram that the distributions are relatively normal, with some right skew for the rare occasions for longer streaks.   The red lines indicate the mean and SD of Kobe's streak performance.
+
+We calulate the mean value of our simulation means to be `r simallmean`.   We calculate the mean of Kobe's 2009 finals streaks to be `r mean_kobe_streak`.  
+
+We calulate the mean value of our simulation sd to be `r simallsd`.   We calculate the sd of Kobe's 2009 finals streaks to be `r sd_kobe_streak`.   It is reassuring that these are relatively similar. 
+
+We can now use the ecdf function to determine where in our simulation Kobe's performance would fall.   We find that his mean streak performance is only >= to `r m(mean_kobe_streak) * 100`% of our simulations.  This would concretely suggest that his performance does not fit the 'hot hand' model.   
 
 <div id="license">
 This is a product of OpenIntro that is released under a 

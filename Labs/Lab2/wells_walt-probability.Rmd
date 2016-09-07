@@ -325,7 +325,7 @@ hist(df$sim_sd, main="Distribution of Simultation \n Streak SD")
 abline(v=sd_kobe_streak, col="red")
 ```
 
-In order to determine whether the streakiness of Kobe's shooting performance is unusual, we'll run a simulation of a 133 shot series for a 45% shooter 10000 times, and record a summary stat for each series - the Mean and SD of each streak.  We can see in the above histogram that the distributions are relatively normal, with some right skew for the rare occasions for longer streaks.   The red lines indicate the mean and SD of Kobe's streak performance.
+In order to determine whether the streakiness of Kobe's shooting performance is unusual, we'll run a simulation of a 133 shot series for a 45% shooter 10000 times, and record a summary stat for each series - the Mean and SD of the streak distribution in each of the 10000 simulations.  We can see in the above histogram that the distributions are relatively normal, with some right skew for the rare occasions for longer streaks.   The red lines indicate the mean and SD of Kobe's streak performance.
 
 We calulate the mean value of our simulation means to be `r simallmean`.   We calculate the mean of Kobe's 2009 finals streaks to be `r mean_kobe_streak`.  
 

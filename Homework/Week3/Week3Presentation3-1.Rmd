@@ -1,0 +1,72 @@
+---
+title: 'Week3 Presentation: OpenIntro Statistics, 3.1 Distributions'
+author: "Walt Wells, Fall 2016"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(IS606)
+```
+
+## 3.1 Area under the curve, Part I. 
+
+What percent of a standard normal distribution is found in each region? Be sure to draw a graph.
+
+(a) Z < -1.35
+(b) Z > 1.48
+(c) -0.4 < Z < 1.5
+(d) |Z| > 2
+
+```{r, message=FALSE}
+# Using normalPlot from IS606 package
+par(mfrow=c(2,2))
+normalPlot(bounds=c(-Inf, -1.35))
+normalPlot(bounds=c(1.48, Inf))
+normalPlot(bounds=c(-0.4, 1.5))
+normalPlot(bounds=c(-2, 2), tails=TRUE)
+```
+
+### Let's use pnorm to confirm percentages 
+
+```{r}
+# a
+round(pnorm(-1.35), 4)
+# b
+round(pnorm(1.48, lower.tail=FALSE), 4)
+# c 
+round(pnorm(1.5) - pnorm(-0.4), 4)
+# d
+round(pnorm(-2) * 2, 4)
+```
+
+### Let's plot one the long way, without the IS606 package
+
+```{r, warning=FALSE}
+# using techniques shown in "R for Everyone" by Jared P. Lander
+library(ggplot2)
+set.seed(60)
+
+#generate line, general dist
+randNorm <- rnorm(30000)
+randDensity <- dnorm(randNorm)
+
+#generate shaded values
+negSeq <- seq(from=min(randNorm), to=-1.35, by=.1)
+lessthanNeg <- data.frame(x=negSeq, y=dnorm(negSeq))
+
+#add endpoints
+lessthanNeg <- rbind(c(min(randNorm), 0),
+                      lessthanNeg,
+                      c(max(lessthanNeg$x), 0))
+
+#plot
+p <- ggplot(data.frame(x=randNorm, y=randDensity)) + aes(x=x,y=y) + geom_line() + labs(x="x", y="Density") +  geom_polygon(data=lessthanNeg, aes(x=x, y=y), fill='red')+
+    ggtitle(expression(phi(x < -1.35) == paste(frac(1, sqrt(2 * pi)), " ", integral(e^(-t^2/2) * dt, -infinity, -1.35), " ", paste('=0.0885'))))
+
+p
+
+
+```

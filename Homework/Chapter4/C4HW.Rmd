@@ -7,183 +7,147 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(IS606)
+library(ggplot2)
 ```
 
 # Graded
-#### 3.2 Area under the curve, Part II
 
-What percent of a standard normal distribution is found in each region? Be sure to draw a graph.
+##4.4 Heights of adults. 
 
-(a) Z > -1.13
-(b) Z < 0.18
-(c) Z > 8
-(d) |Z| < 0.5
+Researchers studying anthropometry collected body girth measurements
+and skeletal diameter measurements, as well as age, weight, height and gender, for 507 physically active individuals. The histogram below shows the sample distribution of heights in centimeters.
 
-```{r}
-# need to review and calc d
-par(mfrow=c(2,2))
-normalPlot(bounds=c(-1.13, Inf))
-normalPlot(bounds=c(-Inf, 0.18))
-normalPlot(bounds=c(8, Inf))
-normalPlot(bounds=c(-0.5, 0.5))
+![4.4.png](4.4.png)
 
-#a
-round(pnorm(-1.13, lower.tail=FALSE), 3)
-#b
-round(pnorm(0.18), 3)
-#c
-pnorm(8, lower.tail=FALSE)
-#d
-round(pnorm(.5) - pnorm(-.5), 3)
+(a) What is the point estimate for the average height of active individuals? What about the median? __PE Mean = 171.1; PE Median = 170.3__
+(b) What is the point estimate for the standard deviation of the heights of active individuals? What about the IQR? __PE SD = 9.4; PE IQR = Q3 - Q1 = `r 177.8 - 163.8`__
+(c) Is a person who is 1m 80cm (180 cm) tall considered unusually tall? And is a person who is 1m 55cm (155cm) considered unusually short? Explain your reasoning. __180 cm is not unusually tall.  Based on the PE mean and the appearance that the data is relatively normally distributed, 180cm is ~ 1 PE standard deviation above the mean.  Similarly, 155 cm is ~1.5 PE SD below the mean.   It is slightly more unusual for a person in this distribution to be this short, but I would hesitate to call them unusually short.__
+(d) The researchers take another random sample of physically active individuals. Would you expect the mean and the standard deviation of this new sample to be the ones given above? Explain your reasoning. __We would expect the point estimates for the new sample to be similar, but not the same.  It would be difficult to attain these exact same point estimates from a random sample, but we would expect them to be relatively close.__
+(e) The sample means obtained are point estimates for the mean height of all active individuals, if the sample of individuals is equivalent to a simple random sample. What measure do we use to quantify the variability of such an estimate (Hint: recall that $$SD_x = \frac{\sigma}{\sqrt{n}}$$ )? Compute this quantity using the data from the original sample under the condition that the data are a simple random sample. __We compute the standard error of the sample mean to be `r round(9.4/sqrt(507), 4)`.__
+
+##4.14 Thanksgiving spending, Part I. 
+
+The 2009 holiday retail season, which kicked off on November 27, 2009 (the day after Thanksgiving), had been marked by somewhat lower self-reported consumer spending than was seen during the comparable period in 2008. To get an estimate of consumer spending, 436 randomly sampled American adults were surveyed. Daily consumer spending for the six-day period after Thanksgiving, spanning the Black Friday weekend and Cyber Monday, averaged $84.71. A 95% confidence interval based on this sample is ($80.31, $89.11).
+
+Determine whether the following statements are true or false, and explain your reasoning.
+
+![4.14.png](4.14.png)
+
+(a) We are 95% confident that the average spending of these 436 American adults is between $80.31 and $89.11. __False - The point estimate is always in the confidence interval.__
+(b) This confidence interval is not valid since the distribution of spending in the sample is right skewed.  __False - The data is skewed, but not strongly skewed.__
+(c) 95% of random samples have a sample mean between $80.31 and $89.11.  __False.   Our confidence interval is concerned with the population mean, no the sample mean.__
+(d) We are 95% confident that the average spending of all American adults is between $80.31 and $89.11. __True - this is a proper use of the confidence interval.__
+(e) A 90% confidence interval would be narrower than the 95% confidence interval since we don’t need to be as sure about our estimate. __True.  Fishing with a smaller net.__
+(f) In order to decrease the margin of error of a 95% confidence interval to a third of what it is now, we would need to use a sample 3 times larger. __False - in odrder to decrese the margin of error to 1/3 of it's current value, we would need to take 9 times the current sample size.__
+(g) The margin of error is 4.4. __True.   If we take half the confidence interval, we get this value.__
+
+##4.24 Gifted children, Part I. 
+
+Researchers investigating characteristics of gifted children collected data from schools in a large city on a random sample of thirty-six children who were identified as gifted children soon after they reached the age of four. The following histogram shows the distribution of the ages (in months) at which these children first counted to 10 successfully. Also provided are some sample statistics.
+
+![4.24.png](4.24.png)
+
+(a) Are conditions for inference satisfied? __Yes.   The sample is random and sufficiently large, and the population distribution is not strongly skewed.__
+(b) Suppose you read online that children first count to 10 successfully when they are 32 months old, on average. Perform a hypothesis test to evaluate if these data provide convincing evidence that the average age at which gifted children first count to 10 successfully is less than the general average of 32 months. Use a significance level of 0.10.
+$$H_0: \mu = 32$$ 
+$$H_A: \mu < 32$$
+$$\alpha = .10$$
+
+```{r, comment=NA}
+n <- 36
+xbar <- 30.69
+sd <- 4.31
+se <- sd / sqrt(n)
+z <- (xbar - 32) / se
+p <- round(pnorm(-abs(z)), 4)
+normalPlot(bounds = c(-Inf, z))
 ```
 
-#### 3.4 Triathlon times, Part I.
-
-In triathlons, it is common for racers to be placed into age and gender groups. Friends Leo and Mary both completed the Hermosa Beach Triathlon, where Leo competed in the Men, Ages 30 - 34 group while Mary competed in the Women, Ages 25 - 29 group. Leo completed the race in 1:22:28 (4948 seconds), while Mary completed the race in 1:31:53 (5513 seconds). Obviously Leo finished faster, but they are curious about how they did within their respective groups. Can you help them? Here is some information on the performance of their groups:
-
-* The finishing times of the Men, Ages 30 - 34 group has a mean of 4313 seconds with a standard deviation of 583 seconds.
-* The finishing times of the Women, Ages 25 - 29 group has a mean of 5261 seconds with a standard deviation of 807 seconds.
-* The distributions of finishing times for both groups are approximately Normal.
-
-Remember: a better performance corresponds to a faster finish.
-
-(a) Write down the short-hand for these two normal distributions.  
-__Men's:  N(4313, 583); Women's: N(5261, 807)__
-(b) What are the Z-scores for Leo’s and Mary’s finishing times? What do these Z-scores tell you?
+(c) Interpret the p-value in context of the hypothesis test and the data.
+__Our p value is `r p`.   When compared to our alpha of 0.1, we reject the null hypothesis and conclude that there is sufficient effidence to support the claim that gifted children learn to count to 10 before the general population average.__
+(d) Calculate a 90% confidence interval for the average age at which gifted children first count to 10 successfully.
 ```{r}
-leoz <- round((4948 - 4313)/583, 2)
-maryz <- round((5513 - 5261)/807, 2)
+z90 <- 1.645
 ```
-__Leo's Z score is `r leoz` and Mary's Z score is `r maryz`.   Since higher race time numbers indicate a slower race, in this instance a higher Z score means slower, relative to peers.__
+__The 90% confidence interval for when gifted children count to 10 is `r round(xbar - z90 * se, 3)`, `r round(xbar + z90 * se, 3)`.__
 
-(c) Did Leo or Mary rank better in their respective groups? Explain your reasoning.  
-__Since her Z score was 0.31 compared to Leo's 1.09, we can determine she was faster.   Said another way, Leo was 1.09 standard deviations slower than the mean in his peer group, while Mary was only 0.31 slower than the mean in hers.__
+(e) Do your results from the hypothesis test and the confidence interval agree? Explain.
+__The results do agree, as we are concerned with whether the children learn earlier than the average of 32 months.   Since the range of the confidence interval is less than 32, our test are in agreement.__
 
-(d) What percent of the triathletes did Leo finish faster than in his group? 
-__Leo was faster than only `r round(pnorm(1.09, lower.tail=FALSE), 3) * 100`% of his group__
+##4.26 Gifted children, Part II. 
 
-(e) What percent of the triathletes did Mary finish faster than in her group?
-__Mary was faster than only `r round(pnorm(0.31, lower.tail=FALSE), 3) * 100`% of her group__
+Exercise 4.24 describes a study on gifted children. In this study, along with variables on the children, the researchers also collected data on the mother’s and father’s IQ of the 36 randomly sampled gifted children. The histogram below shows the distribution of mother’s IQ. Also provided are some sample statistics.
 
-(f) If the distributions of finishing times are not nearly normal, would your answers to parts (b) - (e) change? Explain your reasoning.
-__We would not have been able to standardize their scores if the distribution were not nearly normal, so the approaches we took in parts b-e would all need to be reconsidered.__
+![4.26.png](4.26.png)
 
-#### 3.18 Heights of female college students. 
+(a) Perform a hypothesis test to evaluate if these data provide convincing evidence that the average IQ of mothers of gifted children is different than the average IQ for the population at large, which is 100. Use a significance level of 0.10.
 
-(a) The mean height is 61.52 inches with a standard deviation of 4.58 inches. Use this information to determine if the heights approximately follow the 68-95-99.7% Rule.
-__Below we calculate the percentage of the distribution that fall within 1, 2, and 3 standard deviations of the mean.   Our results (.68, .96, and 1) follow the rule closely.__
-(b) Do these data appear to follow a normal distribution? Explain your reasoning using the graphs provided below.
-__The data does seem to follow the normal distribution.  The QQ plot and histogram both indicate normality even with a small sample.  We test this assumption by using the qqnormsim function compare a QQ plot of our data to 8 additional QQ plots of selected from the normal distribution with a similar sample size.  Our data is actually appears more normal than some of the samples!__
-
-![3.18](3.18.png)
+$$H_0: \mu = 100$$ 
+$$H_A: \mu \neq 100$$
+$$\alpha = .10$$
 
 ```{r}
-fheight <- c(54, 55, 56, 56, 57, 
-             58, 58, 59, 60, 60, 
-             60, 61, 61, 62, 62, 
-             63, 63, 63, 64, 65, 
-             65, 67, 67, 69, 73)
-
-mu <- mean(fheight)
-sd <- sd(fheight)
-
-# test 68
-length(fheight[fheight < mu + sd & fheight > mu - sd]) / length(fheight)
-# test 95
-length(fheight[fheight < mu + 2*sd & fheight > mu - 2*sd]) / length(fheight)
-# test 99.7
-length(fheight[fheight < mu + 3*sd & fheight > mu - 3*sd]) / length(fheight)
-
-qqnormsim(fheight)
+xbar <- 118.2
+n <- 36
+sd <- 6.5
+se <- sd / sqrt(n)
+z <- (xbar - 100) / se
+p <- 2 * (1-round(pnorm(z), 4))
 ```
 
-#### 3.22  Defective rate. 
+__We definitely reject the null hypothesis and conclude that the average IQ of mothers of gifted children is different than the average IQ for the population at large.   Our Z value in this two-sided test ended up being 16.8, a massive value.  When we look at the min of the sample distribution of the mother's IQs, we see that it is above the value we are testing (100), helping explain this Z.__
 
-A machine that produces a special type of transistor (a component of computers) has a 2% defective rate. The production is considered a random process where each transistor is independent of the others.
+(b) Calculate a 90% confidence interval for the average IQ of mothers of gifted children.
+__The 90% confidence interval for the average IQ of mothers of gifted children is `r round(xbar - z90 * se, 3)`, `r round(xbar + z90 * se, 3)`.__
 
-(a) What is the probability that the 10th transistor produced is the first with a defect?
+(c) Do your results from the hypothesis test and the confidence interval agree? Explain.
+__They do.   In the p test we get a value well under our alpha, causing us to reject the null hypothesis.   In the 90% confidence test we get an interval also nowhere near the null hypothesis value, causing us to reject and accept the alternative hypothesis.__
+
+##4.34 CLT. 
+
+Define the term “sampling distribution” of the mean, and describe how the shape, center, and spread of the sampling distribution of the mean change as sample size increases.  __A sampling distribution shows the distribution of n samples from a population.  As the sample size n increases, the shape of the sample distribution approaches the normal distribution, the center becomes more pronounced (indicating a greater quantity of samples closer to the population mean), and the spread becomes narrower as larger amount of the samples congregate around the mean.__
+
+##4.40 CFLBs. 
+
+A manufacturer of compact fluorescent light bulbs advertises that the distribution of the lifespans of these light bulbs is nearly normal with a mean of 9,000 hours and a standard deviation of 1,000 hours.
+
+(a) What is the probability that a randomly chosen light bulb lasts more than 10,500 hours?
 ```{r}
-#note - r's _geom package does not seem to use n-1, so built own function
-geom <- function(n, p){
-    p * (1-p) ^ (n-1)
-}
-p <- .02
-geom(10, p)
+mean <- 9000
+sd <- 1000
+z <- (10500 - mean) / sd
+p <- round(1 - pnorm(z), 4)
+normalPlot(bounds = c(z, Inf))
 ```
-(b) What is the probability that the machine produces no defective transistors in a batch of 100?
+
+(b) Describe the distribution of the mean lifespan of 15 light bulbs.
 ```{r}
-(1-p)^100
+se <- round(sd / sqrt(15))
 ```
-(c) On average, how many transistors would you expect to be produced before the first with a defect? What is the standard deviation?
+__The distribution will be relatively normal with a standard error of `r se` and a point estimate near the population mean.__
+
+(c) What is the probability that the mean lifespan of 15 randomly chosen light bulbs is more than 10,500 hours?
 ```{r}
-# first defect at:
-1/p
-# sd: 
-sqrt((1-p)/p^2)
+z <- round((10500 - 9000)/se, 2)
 ```
-(d) Another machine that also produces transistors has a 5% defective rate where each transistor is produced independent of the others. On average how many transistors would you expect to be produced with this machine before the first with a defect? What is the standard deviation?
+__Our z score (`r z`) is very high.   It is highly improbable that the mean lifespan of a sample distribution of 15 randomly chosen bulbs would be > 10500.__
+
+(d) Sketch the two distributions (population and sampling) on the same scale. __Note: Uses a solution for plotting multiple distributions recommended in a stackoverflow response, ref: [http://stackoverflow.com/questions/6939136/how-to-overlay-density-plots-in-r](http://stackoverflow.com/questions/6939136/how-to-overlay-density-plots-in-r).__
 ```{r}
-# new p:
-p <- .05
-# first defect at:
-1/p
-# sd: 
-sqrt((1-p)/p^2)
-```
-(e) Based on your answers to parts (c) and (d), how does increasing the probability of an event affect the mean and standard deviation of the wait time until success?
-__In the geometric distribution, increasing the probability of an event will lower both the mean and the standard deviation regarding how many trials until an occurence.__
-
-#### 3.38 Male children. 
-
-While it is often assumed that the probabilities of having a boy or a girl are the same, the actual probability of having a boy is slightly higher at 0.51. Suppose a couple plans to have 3 kids.
-
-(a) Use the binomial model to calculate the probability that two of them will be boys.
-```{r}
-dbinom(2, 3, prob=0.51)
-#confirm
-bindist <- function(n, k, p) {
-    choose(n, k) * p^k * (1-p) ^ (n-k)
-}
-bindist(3, 2, 0.51)
+set.seed(15)
+dat <- data.frame(population=rnorm(15, mean, sd),
+                  sampling=rnorm(15, mean, se))
+dens <- apply(dat, 2, density)
+plot(NA, xlim=range(sapply(dens, "[", "x")), ylim=range(sapply(dens, "[", "y")))
+mapply(lines, dens, col=1:length(dens))
+legend("topright", legend=names(dens), fill=1:length(dens))
 ```
 
-(b) Write out all possible orderings of 3 children, 2 of whom are boys. Use these scenarios to calculate the same probability from part (a) but using the addition rule for disjoint outcomes. Confirm that your answers from parts (a) and (b) match.  __We have a match!__
+(e) Could you estimate the probabilities from parts (a) and (c) if the lifespans of light bulbs had a skewed distribution?
+__No, estimates require a distribution with relatively little skew.__
 
-```{r}
-# B B G
-s1 <- .51 * .51 * .49
-# B G B
-s2 <- .51 * .49 * .51
-# G B B
-s3 <- .49 * .51 * .51
+##4.48  Same observation, different sample size. 
 
-s1 + s2 + s3
+Suppose you conduct a hypothesis test based on a sample where the sample size is n = 50, and arrive at a p-value of 0.08. You then refer back to your notes and discover that you made a careless mistake, the sample size should have been n = 500. Will your p-value increase, decrease, or stay the same? Explain.
 
-```
-
-(c) If we wanted to calculate the probability that a couple who plans to have 8 kids will have 3 boys, briefly describe why the approach from part (b) would be more tedious than the approach from part (a). 
-__Drawing out the sample space would require `r choose(8, 3)` samples.  That's not a particularly fun exercise.__
-
-#### 3.42 Serving in volleyball. 
-
-A not-so-skilled volleyball player has a 15% chance of making the
-serve, which involves hitting the ball so it passes over the net on a trajectory such that it will land in the opposing team’s court. Suppose that her serves are independent of each other.
-
-```{r}
-# let's use the negative binomial distribution.   note, similar to
-# the geometric distribution, dnbinom does not use n-1 and k-1, so 
-# we'll define our own function to ensure accuracy
-nb <- function(n, k, p) {
-    choose(n-1, k-1) * p^k * ((1-p)^(n-k))
-}
-```
-
-(a) What is the probability that on the 10th try she will make her 3rd successful serve?  
-__The probability is `r round(nb(10, 3, .15), 4)`__
-
-(b) Suppose she has made two successful serves in nine attempts. What is the probability that her 10th serve will be successful?
-__Since we are supposing that her serves are independant, we believe that her 10th serve will simply be the original probability of .15.__
-
-(c) Even though parts (a) and (b) discuss the same scenario, the probabilities you calculated should be different. Can you explain the reason for this discrepancy?
-__This is consistent with the principles of the negative binomial distribution.   Sine we're calculating at n-1 and k-1, even applying something like the probability of 1 in 1 (.15) times the probability of 2 in 9 (`r round(nb(9, 2, .15), 4)`) would yield different results (`r round(nb(9, 2, .15) * .15, 4)`) than calculating 3 in 10 (`r round(nb(10, 3, .15), 4)`).__
-
+__Since the sample size increases, this means the initial error was made in calculating the SE, compromising the integrity of the z score and p-value.  This new larger sample will cause the SE to decrease in size, the z score to increase, and the probability/p-value to decrease based on the new, higher z.  If you were unable to reject the null hypothesis with a p-value of 0.08, you may be able to with the new p-value.__

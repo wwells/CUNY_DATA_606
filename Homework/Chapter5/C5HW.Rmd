@@ -18,6 +18,15 @@ Practice: 5.5, 5.13, 5.19, 5.31, 5.45
 
 A 90% confidence interval for a population mean is (65, 77). The population distribution is approximately normal and the population standard deviation is unknown. This confidence interval is based on a simple random sample of 25 observations.  Calculate the sample mean, the margin of error, and the sample standard deviation.
 
+```{r}
+sampmean <- (77+65)/2
+tdf <- round(qt(c(.05, .95), df=24)[2], 3)
+SE <- round((77-sampmean)/tdf, 3)
+sd <- SE * sqrt(25)
+```
+
+__Our $\bar{x}$ is `r sampmean`, the SE is `r SE` and the sample SD is roughly `r sd`. __
+
 ## 5.14 SAT scores
 
 SAT scores of students at an Ivy League college are distributed with a standard deviation of 250 points. Two statistics students, Raina and Luke, want to estimate the average SAT score of students at this college as part of a class project. They want their margin of

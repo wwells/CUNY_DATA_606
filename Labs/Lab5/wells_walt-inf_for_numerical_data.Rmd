@@ -20,7 +20,7 @@ observations from this data set.
 
 Load the `nc` data set into our workspace.
 
-```{r load-data, eval=FALSE}
+```{r load-data}
 load("more/nc.RData")
 ```
 
@@ -45,10 +45,12 @@ variable         | description
 
 1.  What are the cases in this data set? How many cases are there in our sample?
 
+__A case is a row, of which there 1000, our sample size.__
+
 As a first step in the analysis, we should consider summaries of the data. This
 can be done using the `summary` command:
 
-```{r summary, eval=FALSE}
+```{r summary}
 summary(nc)
 ```
 
@@ -64,18 +66,21 @@ questions.
 2.  Make a side-by-side boxplot of `habit` and `weight`. What does the plot 
 highlight about the relationship between these two variables?
 
+```{r}
+boxplot(nc$weight ~ nc$habit)
+```
+
 The box plots show how the medians of the two distributions compare, but we can
 also compare the means of the distributions using the following function to 
 split the `weight` variable into the `habit` groups, then take the mean of each
 using the `mean` function.
 
-```{r by-means, eval=FALSE}
+```{r by-means}
 by(nc$weight, nc$habit, mean)
 ```
 
 There is an observed difference, but is this difference statistically 
-significant? In order to answer this question we will conduct a hypothesis test
-.
+significant? In order to answer this question we will conduct a hypothesis test.
 
 ## Inference
 
@@ -84,15 +89,27 @@ you will need to obtain sample sizes to check the conditions. You can compute
 the group size using the same `by` command above but replacing `mean` with 
 `length`.
 
+```{r}
+by(nc$weight, nc$habit, length)
+par(mfrow=c(2,1))
+hist(nc$weight[nc$habit=="nonsmoker"])
+hist(nc$weight[nc$habit=="smoker"])
+```
+
+__We should be able to apply the t distribution because observations come from a nearly normal distribution, even though the smoker group has moderate skew.__
+
 4.  Write the hypotheses for testing if the average weights of babies born to 
 smoking and non-smoking mothers are different.
+
+__$H_O$: $\mu_n - \mu_s = 0$, No difference between average weight of newborns for mothers who don't smoke to mothers who do.__
+
+__$H_A$: $\mu_n - \mu_s \neq 0$, There is a difference.__
 
 Next, we introduce a new function, `inference`, that we will use for conducting
 hypothesis tests and constructing confidence intervals. 
 
-```{r inf-weight-habit-ht, eval=FALSE, tidy=FALSE}
-inference(y = nc$weight, x = nc$habit, est = "mean", type = "ht", null = 0, 
-          alternative = "twosided", method = "theoretical")
+```{r inf-weight-habit-ht}
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ht", null = 0, alternative = "twosided", method = "theoretical")
 ```
 
 Let's pause for a moment to go through the arguments of this custom function. 
@@ -112,10 +129,14 @@ of inference can be `"theoretical"` or `"simulation"` based.
 interval for the difference between the weights of babies born to smoking and 
 non-smoking mothers.
 
+```{r}
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ci", null = 0, alternative = "twosided", method = "theoretical")
+```
+
 By default the function reports an interval for ($\mu_{nonsmoker} - \mu_{smoker}$)
 . We can easily change this order by using the `order` argument:
 
-```{r inf-weight-habit-ci, eval=FALSE, tidy=FALSE}
+```{r inf-weight-habit-ci}
 inference(y = nc$weight, x = nc$habit, est = "mean", type = "ci", null = 0, 
           alternative = "twosided", method = "theoretical", 
           order = c("smoker","nonsmoker"))
@@ -130,15 +151,43 @@ inference(y = nc$weight, x = nc$habit, est = "mean", type = "ci", null = 0,
 on a single population parameter, there is no explanatory variable, so you can 
 omit the `x` variable from the function.
 
+```{r}
+inference(y = nc$weeks,  est = "mean", type = "ci", null = 0, alternative = "twosided", method = "theoretical")
+```
+
+__We are 95 percent confident that the population mean is between 38.1528 and 38.5165.__
+
 -   Calculate a new confidence interval for the same parameter at the 90% 
 confidence level. You can change the confidence level by adding a new argument 
 to the function: `conflevel = 0.90`.
 
+```{r}
+inference(y = nc$weeks,  est = "mean", type = "ci", null = 0, alternative = "twosided", method = "theoretical", conflevel= 0.9)
+```
+
+__We are 90 percent confident that the population mean is between 38.182 and 38.4873.__
+
 -   Conduct a hypothesis test evaluating whether the average weight gained by 
 younger mothers is different than the average weight gained by mature mothers.
 
+__$H_O$: $\mu_y - \mu_m = 0$, No difference between average weight gain of younger mothers and mature mothers.__
+
+__$H_A$: $\mu_y - \mu_m \neq 0$, There is a difference.__
+
+```{r}
+inference(y = nc$gained, x = nc$mature, est = "mean", type = "ht", null = 0, alternative = "twosided", method = "theoretical", order=c("younger mom", "mature mom"))
+```
+
+__Our pvalue of 0.1686 is high enough that we do not reject $H_O$.   The difference between the average weight gain of younger mothers and mature mothers is not statistcally significant.__
+
 -   Now, a non-inference task: Determine the age cutoff for younger and mature 
 mothers. Use a method of your choice, and explain how your method works.
+
+```{r}
+table(nc$mage, nc$mature)
+```
+
+__We can quickly see by constructing a table the breakpoint for where the data curators classified mothers as young is $\leq$ 34.  Mature > 34.__
 
 -   Pick a pair of numerical and categorical variables and come up with a 
 research question evaluating the relationship between these variables. 
@@ -146,6 +195,19 @@ Formulate the question in a way that it can be answered using a hypothesis test
 and/or a confidence interval. Answer your question using the `inference` 
 function, report the statistical results, and also provide an explanation in 
 plain language.
+
+__Let's test if there is a statistically significant difference between the birthweight of babies born to younger mothers vs mature mothers.__ 
+
+__$H_O$: $\mu_y - \mu_m = 0$, No difference between birthweight of babies born to younger mothers and mature mothers.__
+
+__$H_A$: $\mu_y - \mu_m \neq 0$, There is a difference.__
+
+```{r}
+inference(y = nc$weight, x = nc$mature, est = "mean", type = "ht", null = 0, alternative = "twosided", method = "theoretical", order=c("younger mom", "mature mom"))
+```
+
+__There is really no discernable difference between the birthweights of babies born to younger mothers vs mature mothers.   Our pvalue is very very high (0.8526) so we overwhelmingly accept $H_O$.__
+
 
 <div id="license">
 This is a product of OpenIntro that is released under a [Creative Commons 

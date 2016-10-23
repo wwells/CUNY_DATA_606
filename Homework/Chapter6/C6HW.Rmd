@@ -101,7 +101,7 @@ me <- round(se * z, 6)
 diff - me; diff + me
 ```
 
-__We are 95% confident that the difference in proportion of Oregonians who reported insufficient sleep to Californians is between -.174% (negative indicating that Californians reported more insufficient sleep) and 1.74%.__
+__We are 95% confident that the difference in proportion of Oregonians who reported insufficient sleep to Californians is between -.149% (negative indicating that Californians reported more insufficient sleep) and 1.75%.__
 
 ## 6.44 Barking deer. 
 
@@ -109,16 +109,37 @@ Microhabitat factors associated with forage and bed sites of barking deer
 in Hainan Island, China were examined from 2001 to 2002. In this region woods make up 4.8% of the land, cultivated grass plot makes up 14.7% and deciduous forests makes up 39.6%. Of the 426 sites where the deer forage, 4 were categorized as woods, 16 as cultivated grassplot, and 61 as deciduous forests. The table below summarizes these data. 
 
 ```{r}
-r <- c(4, 16, 67, 345, 426)
-v <- c("Woods", "Cultivated grassplot", "Deciduous forests", "Other", "Total")
-df <- rbind(v, r)
+t <- 426
+woods <- c(4, round(t * .048))
+grassplot <- c(16, round(t * .147))
+forests <- c(67, round(t * .396))
+other <- c(345, round(t * .409))
+total <- c(t, t)
+df <- data.frame(rbind(woods, grassplot, forests, other, total))
+colnames(df) <- c("observed", "expected")
+df$z2 <- (df$observed-df$expected)^2 / df$expected
+x2 <- round(sum(df$z2), 2)
+free <- 3
 knitr::kable(df)
 ```
 
 (a) Write the hypotheses for testing if barking deer prefer to forage in certain habitats over others.
+
+__$H_O$: The deer foraging sites are a random sample.   They do not prefer certain habitats over others.__
+
+__$H_A$: The deer foraging sites are not randomly sampled.   They do have a preference.__ 
+
 (b) What type of test can we use to answer this research question?
+
+__A Chi-square test will help us determine if the observed observation is a random sample.__
+
 (c) Check if the assumptions and conditions required for this test are satisfied.
+
+__We believe that the counts are independant.   While we have an observed value of 4 woods, we have an expected value of 20.__
+
 (d) Do these data provide convincing evidence that barking deer prefer to forage in certain habitats over others? Conduct an appropriate hypothesis test to answer this research question.
+
+__Our test statistic is extremely high $X^2$ = `r x2` with 3 degrees of freedom.  We take a cursory look and see that our p-value is terrifically low.   This gives us reason to reject $H_O$ and conclude that barking deer do in fact prefer to forage in certain habitats.__
 
 ## 6.48 Coffee and Depression
 

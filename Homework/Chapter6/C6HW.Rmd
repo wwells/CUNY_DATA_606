@@ -148,9 +148,42 @@ Researchers conducted a study investigating the relationship between caffeinated
 ![6.48](6.48.png)
 
 (a) What type of test is appropriate for evaluating if there is an association between coffee intake and depression?
+
+__We will use a two way table test for independence.__
+
 (b) Write the hypotheses for the test you identified in part (a).
+
+__$H_0$: Coffee Consumption has no effect on depression.__
+
+__$H_A$: Coffee Consumption has some effect on depression.__
+
 (c) Calculate the overall proportion of women who do and do not suffer from depression.
+
+```{r}
+pY <- round(2607/50739, 3)
+pN <- round(48132/50739, 3)
+pY; pN
+```
+
 (d) Identify the expected count for the highlighted cell, and calculate the contribution of this cell to the test statistic, i.e. (Observed - Expected)^2 / Expected
+
+```{r}
+missing <- pY * 6617
+(373-missing)^2 / missing
+```
+
 (e) The test statistic is X^2 = 20.93. What is the p-value?
+
+__Since the DF = 5-1 * 2-1 = 4, the p-value is less than .001.__ 
+
+```{r}
+pchisq(20.93, 4, lower.tail=FALSE)
+```
+
 (f) What is the conclusion of the hypothesis test?
+
+__Since the p-value is so low, we reject $H_O$ and conclude that there is convincing evidence that coffee consumption has some effect on depression.__
+
 (g) One of the authors of this study was quoted on the NYTimes as saying it was “too early to recommend that women load up on extra coffee” based on just this study.  Do you agree with this statement? Explain your reasoning.
+
+__I do.   I haven't been on the earth that long, but I have seen studies in the last 20 years linking coffee consumption to increased cancer risk, decreased cancer risk, increased heart disease, decreased heart disease, etc.   While the data in this two way table test does seem to support the conclusion, there could be many many confounding factors that would lead to these results.__

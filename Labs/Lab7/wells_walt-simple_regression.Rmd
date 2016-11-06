@@ -1,11 +1,11 @@
 ---
 title: "Introduction to linear regression"
 output:
+  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
-  pdf_document: default
 ---
 
 ## Batter up 
@@ -69,7 +69,7 @@ such as `runs` and `at_bats` above.
     between these two variables. Make sure to discuss the form, direction, and 
     strength of the relationship as well as any unusual observations.
 
-__These two variables appear to be positively correlated in a moderately strong fashion.__
+__These two variables appear to be positively correlated and show a weak upward trend.__
 
 Just as we used the mean and standard deviation to summarize a single variable, 
 we can summarize the relationship between these two variables by finding the 
@@ -186,7 +186,8 @@ They're also used to compute the residuals.
 ```{r}
 predict(m1, data.frame(at_bats <- 5578))
 ```
-  
+
+__We don't know the residual since this is a prediction and we don't have an observed value, only an expected.__  
 
 ## Model diagnostics
 
@@ -206,6 +207,8 @@ abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
 6.  Is there any apparent pattern in the residuals plot? What does this indicate
     about the linearity of the relationship between runs and at-bats?
 
+__The residuals plot looks about the way we would expect, that data seems normal-ish, and while there is one outlier around 5515 at_bats, the variability of most of the dataset is similar.__
+
 *Nearly normal residuals*: To check this condition, we can look at a histogram
 
 ```{r hist-res}
@@ -221,11 +224,15 @@ qqline(m1$residuals)  # adds diagonal line to the normal prob plot
 
 7.  Based on the histogram and the normal probability plot, does the nearly 
     normal residuals condition appear to be met?
+    
+__Yes.   The data looks nearly normal.__
 
 *Constant variability*:
 
 8.  Based on the plot in (1), does the constant variability condition appear to 
     be met?
+    
+__This is a little more questionable.   As noted earlier, there is an outlier around 5515 at_bats.__
     
 * * *
 
@@ -235,10 +242,23 @@ qqline(m1$residuals)  # adds diagonal line to the normal prob plot
     good predictor of `runs`. Produce a scatterplot of the two variables and fit 
     a linear model. At a glance, does there seem to be a linear relationship?
 
+```{r}
+plot(mlb11$hits, mlb11$runs)
+```
+
+__Yes, there seems to be a linear relationship.__
+
 -   How does this relationship compare to the relationship between `runs` and 
     `at_bats`? Use the R$^2$ values from the two model summaries to compare. 
     Does your variable seem to predict `runs` better than `at_bats`? How can you
     tell?
+    
+```{r}
+m3 <- lm(hits ~ runs, mlb11)
+summary(m1)$r.squared
+summary(m3)$r.squared
+m3cor <- cor(mlb11$runs, mlb11$hits)
+```
 
 -   Now that you can summarize the linear relationship between two variables, 
     investigate the relationships between `runs` and each of the other five 
@@ -246,6 +266,36 @@ qqline(m1$residuals)  # adds diagonal line to the normal prob plot
     conclusion using the graphical and numerical methods we've discussed (for 
     the sake of conciseness, only include output for the best variable, not all 
     five).
+    
+```{r}
+# helper functions
+r2func <- function(col) {
+    t <- lm(mlb11$runs ~mlb11[[col]])
+    r2 <- summary(t)$r.squared
+    r2
+}
+
+corrfunc <- function(col) {
+    cor(mlb11$runs, mlb11[[col]])
+}
+
+# prep list
+list <- names(mlb11)[3:9]
+
+# get r2 and cor for each old var
+r2list <- sapply(list, r2func)
+corlist <- sapply(list, corrfunc)
+
+# bind and sort
+df <- data.frame(r2list, corlist)
+df <- df[order(df$r2list, decreasing=TRUE), ]
+
+knitr::kable(df)
+```
+
+__I chose to take a slightly different approach to this problem, creating helper functions to pull out the R2 for the best linear fit and correlation between each other "old" variable and runs and then create a table to quickly and easily sees which other variable best predict runs scored.__
+
+__We can see that of the old variables, batting average is the strongest single fit, and a reduction of about 65% of the data's variability can be expected using a linear model with batting average.__
 
 -   Now examine the three newer variables. These are the statistics used by the 
     author of *Moneyball* to predict a teams success. In general, are they more 
@@ -254,9 +304,46 @@ qqline(m1$residuals)  # adds diagonal line to the normal prob plot
     analyzed, which seems to be the best predictor of `runs`? Using the limited 
     (or not so limited) information you know about these baseball statistics, 
     does your result make sense?
+    
+```{r}
+# new list
+list <- names(mlb11)[10:12]
+
+# get r2 and cor for each old var
+r2listnew <- sapply(list, r2func)
+corlistnew <- sapply(list, corrfunc)
+
+# bind and sort
+df2 <- data.frame(r2listnew, corlistnew)
+df2 <- df2[order(df2$r2listnew, decreasing=TRUE), ]
+
+knitr::kable(df2)
+
+```
+    
+
+__We can quickly see that each of these new variables outperforms the older models.   In particular, onbase + slugging is a very very strong predictor of runs.__ 
 
 -   Check the model diagnostics for the regression model with the variable you 
     decided was the best predictor for runs.
+    
+```{r}
+m4 <- lm(mlb11$runs ~ mlb11$new_obs)
+
+par(mfrow=c(2,2))
+#p1
+plot(mlb11$runs ~ mlb11$new_obs)
+abline(m4)
+#p2
+plot(m4$residuals ~ mlb11$new_obs)
+abline(h = 0, lty = 3)
+#p3
+hist(m4$residuals)
+#p4
+qqnorm(m4$residuals)
+qqline(m4$residuals)
+
+```
 
 <div id="license">
 This is a product of OpenIntro that is released under a [Creative Commons 

@@ -20,9 +20,20 @@ The scatterplot below shows the relationship between the number of calories and 
 ![](7.24.png)
 
 (a) Describe the relationship between number of calories and amount of carbohydrates (in grams) that Starbucks food menu items contain.
+
+__There is seems to be a positive correlation with a mild upward trend between calories and carbohydrates.__
+
 (b) In this scenario, what are the explanatory and response variables?
+
+__Explanatory = Calories; Response =  Carbs (in grams)__
+
 (c) Why might we want to fit a regression line to these data?
+
+__We might want to predict how many grams of carbs some food contains, given a certain calorie count.__
+
 (d) Do these data meet the conditions required for fitting a least squares line?
+
+__While the data fit a linear trend, and the residuals appear nearly normal, we may not meet the criteria for constant variablity.   We can see that as calories increase so to does the variability of carbs.__
 
 ## 7.26  Body measurements, Part III. 
 

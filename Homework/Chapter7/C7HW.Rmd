@@ -40,12 +40,42 @@ __While the data fit a linear trend, and the residuals appear nearly normal, we 
 Exercise 7.15 introduces data on shoulder girth and height of a group of individuals. The mean shoulder girth is 107.20 cm with a standard deviation
 of 10.37 cm. The mean height is 171.14 cm with a standard deviation of 9.41 cm. The correlation between height and shoulder girth is 0.67.
 
+```{r}
+b1 <- round(0.67 * (9.41/10.35), 4)
+b0 <- round(b1 * -107.20 + 171.14, 4)
+```
+
 (a) Write the equation of the regression line for predicting height.
+
+\[
+  \hat{y} = `r b0` + `r b1` * shouldergirth
+\]
+
 (b) Interpret the slope and the intercept in this context.
+
+__For each additional cm of shoulder girth, we would expect an additional `r b1` of height.   If the individual had 0 shoulder girth, we would expect a height of `r b1`.__
+
 (c) Calculate R2 of the regression line for predicting height from shoulder girth, and interpret it in the context of the application.
+
+__The R2 is the square of our given correlation, or `r 0.67^2`.   In this context,  a reduction of about 65% of the data's variability can be expected using a linear model with shoulder girth.__
+
 (d) A randomly selected student from your class has a shoulder girth of 100 cm. Predict the height of this student using the model.
+
+```{r}
+b0 + b1 * 100
+```
+
 (e) The student from part (d) is 160 cm tall. Calculate the residual, and explain what this residual means.
+
+```{r}
+160 - 166.7545
+```
+
+__The residual implies that our model overestimated the prediction by the amount above. __
+
 (f) A one year old has a shoulder girth of 56 cm. Would it be appropriate to use this linear model to predict the height of this child?
+
+__Because this value is an outlier and isn't considered in the model creation (> 4 SD away from mean), it would be inappropriate to predict the height using our model.__
 
 ## 7.30  Cats, Part I. 
 
@@ -54,10 +84,26 @@ The following regression output is for predicting the heart weight (in g) of cat
 ![](7.30.png)
 
 (a) Write out the linear model.
+
+\[
+  \hat{y} = -0.357 + 4.034 * bodyweight
+\]
+
 (b) Interpret the intercept.
+
+__If a cat's body weight were 0 kg, we would expect their heart to weight -0.357 grams.__
+
 (c) Interpret the slope.
+
+__For each additional kg of body weight, we expect a cat's heart to weigh and additional 4.034 grams.__
+
 (d) Interpret R2.
+
+__A reduction of about 64% of the data's variability can be expected using a linear model prediciting heart weight using body weight.__
+
 (e) Calculate the correlation coefficient.
+
+__The correlation coefficient is calculated as `r sqrt(.6466)`.__
 
 ## 7.40  Rate my professor. 
 
@@ -66,7 +112,20 @@ Many college courses conclude by giving students the opportunity to evaluate the
 ![](7.40a.png)
 
 (a)  Given that the average standardized beauty score is -0.0883 and average teaching evaluation score is 3.9983, calculate the slope. Alternatively, the slope may be computed using just the information provided in the model summary table.
+
+```{r}
+b0 <- 4.010
+b1 <- 4.13 * .0322
+```
+
+__The slope is `r b1`.__
+
 (b)  Do these data provide convincing evidence that the slope of the relationship between teaching evaluation and beauty is positive? Explain your reasoning.
+
+__There is convincing evidence that the slope is positive.  The Pvalue of the output for a onesided test is small, suggesting we should reject a $H_O$ and conclude that there is convincing evidence that as a teacher's beauty score increases so to does the likelhood of a better teaching evaluation score.  We assume the regression output supports this interpretation of $H_O$ and $H_A$.__
+
 (c)  List the conditions required for linear regression and check if each one is satisfied for this model based on the following diagnostic plots.
 
 ![](7.40b.png)
+
+__It seems that all the conditions are met.  The residuals are nearly normal and show relatively constant variability.   We believe these are independant observation.   And the data shows a minor linear trend.__

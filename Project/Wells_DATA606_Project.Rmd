@@ -1,0 +1,139 @@
+---
+title: 'DATA 606:  Final Project'
+author: "Walt Wells, Fall 2016"
+output:
+  html_document:
+    theme: lumen
+    highlight: zenburn
+    css: ../custom.css
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1 - Introduction:
+
+### Research question 
+
+In this project we will examine campaign expenditures for the 2016 US presidential election.   We will concentrate on the two major party nominees, and will look at expenditures by the month, starting in Feb 2016.   
+
+Because of the nuances of campaign finance law, while we will be able to see the intake for the campaigns, we will not be able to see fund intake for the independent PACs.   As a result, we will look at expenditures.   
+
+The summary stats by month for each campaign are already available.  We will tidy the independant PAC data to create monthy summary expenditures for groups that favor or oppose the two major party nominees. 
+
+Our goal is to compare monthly expenditures for the campaign and for PACs across the two candidates.   We will further attempt to use the "sup_opp" variable in the PAC data to divide PAC expenditures across "negative" or "positive" efforts. 
+
+__NOTE:__   Before the project is due, there should be another month release of the data.   We will update our collected dataset accordingly.   The data cleaning methods we build are expected to work well with new observations.   Three cheers for reproduceable research!
+
+__NOTE2:__ A secondary study I may choose to conduct will be to further explore PAC data by the "pur" or "purpose of expenditure" category and review what PACs were spending their money on.   This would require some superior data cleaning efforts, as this var currently has 1362 levels with items as varied as "Robocalls" and "Taxi from event".   
+
+### Environment Prep
+
+```{r, warning=FALSE, message=FALSE}
+if (!require('dplyr')) install.packages('dplyr')
+if (!require('stringr')) install.packages('stringr')
+if (!require('ggplot2')) install.packages('ggplot2')
+```
+
+## Part 2 - Data:
+
+```{r}
+# load data
+camp <- read.csv("FEC_campaign_summary.csv")
+pac <- read.csv("FEC_independent-expenditure.csv")
+```
+
+
+### Cases 
+
+In our raw data, there are of the campaign `r nrow(camp)` data and `r nrow(pac)` of the PAC data.  
+
+Really, we'll only want the monthly observations for our two candidates so once the data is cleaned and merged into a long format dataset, I would expect the number of cases = n months * 6, where 6 represents ClintonCampaign, ProClintonPAC, AntiClintonPAC, TrumpCampaign, ProTrumpPAC, AntiTrumpPAC. 
+
+### Data collection 
+
+**Describe the method of data collection.**
+
+The data is delivered to the FEC and redistributed to the public as part of disclosure law. 
+
+"The Federal Election Commission (FEC) is an independent regulatory agency established in 1975 to administer and enforce the Federal Election Campaign Act (FECA). That statute limits the sources and amounts of the contributions used to finance federal elections, requires public disclosure of campaign finance information and--in tandem with the Primary Matching Payment Act and the Presidential Election Campaign Fund Act--provides for the public funding of Presidential elections. For more information on the FEC's role in regulating federal elections, see the brochure "The FEC and the Federal Campaign Finance Law." - From the [FEC Site](http://www.fec.gov/about.shtml)
+
+### Type of study 
+
+**What type of study is this (observational/experiment)?**
+
+This is an observational data study.
+
+### Data Source 
+
+**If you collected the data, state self-collected. If not, provide a citation/link.**
+
+Data is source from is publicly available datasets from the [Federal Election Commission](http://fec.gov/about.shtml).   The data we will examine includes summary data on the 2016 US Presidential election from both the [campaigns](http://fec.gov/disclosurep/PDownload.do?candId=P00000001&electionYr=2016&candNmTitle=All%20Candidates&downloadComeFrom=pNational) and [independant groups or PACs](http://www.fec.gov/data/IndependentExpenditure.do?format=html&cf=superPAC).
+
+### Response 
+
+**What is the response variable, and what type is it (numerical/categorical)?**
+
+The response variable will be the expenditure by the month.   This will be a numerical variable. 
+
+### Explanatory 
+
+**What is the explanatory variable, and what type is it (numerical/categorival)?**
+
+We expect to have a few explanatory variables, candidate (Categorical), whether it is campaign or PAC (Categorical), and month (Categorical).   As we delve deeper, we may wish to add a few additional variables.
+
+
+## Part 3 - Exploratory data analysis:
+
+### Relevant summary statistics 
+
+**Provide summary statistics relevant to your research question. For example, if you’re comparing means across groups provide means, SDs, sample sizes of each group. This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+
+### Campaign Data Initial Review
+
+```{r}
+campsub <- filter(camp, CMTE_NM =="HILLARY FOR AMERICA" | CMTE_NM =="DONALD J. TRUMP FOR PRESIDENT, INC.") %>% 
+    filter(str_detect(RPT_TP, "M")) %>% 
+    arrange(CMTE_NM, RPT_TP) %>% 
+    select(CMTE_NM, RPT_TP, TTL_DISB_SUM_PAGE_PER) %>% 
+    droplevels()
+
+knitr::kable(campsub)
+
+ggplot(campsub, aes(x=RPT_TP, y=TTL_DISB_SUM_PAGE_PER,
+                    group=CMTE_NM, colour=CMTE_NM)) + 
+    geom_line() + ylab("Total Disbursements") + 
+    xlab("Month")
+```
+
+### PAC Data Initial Review
+
+This data set will require some effort to tidy and clean and normalize, including steps to summarize PACs by candidate, summarize expenditures by months, etc.
+
+We can see this quickly by attempting to simply review the values we will use to calculate our monthly sums. 
+
+```{r}
+pac$expenditure <- str_replace_all(as.character(pac$exp_amo), fixed("$"), "")
+pac$expenditure <- as.numeric(str_replace_all(pac$expenditure, ',', ''))
+
+summary(pac$expenditure)
+```
+
+
+
+## Part 4 - Inference:
+
+
+## Part 5 - Conclusion: 
+
+
+## References:
+
+
+## Appendix (optional):
+
+Remove this section if you don't have an appendix

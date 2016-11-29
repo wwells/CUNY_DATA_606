@@ -41,7 +41,7 @@ if (!require('ggplot2')) install.packages('ggplot2')
 
 ## Part 2 - Data:
 
-```{r}
+```{r, cache=TRUE}
 # load data
 camp <- read.csv("FEC_campaign_summary.csv")
 pac <- read.csv("FEC_independent-expenditure.csv")
@@ -89,41 +89,116 @@ We expect to have a few explanatory variables, candidate (Categorical), whether 
 
 ## Part 3 - Exploratory data analysis:
 
-### Relevant summary statistics 
-
-**Provide summary statistics relevant to your research question. For example, if you’re comparing means across groups provide means, SDs, sample sizes of each group. This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
-
-### Campaign Data Initial Review
+### Campaign Data Prep
 
 ```{r}
+#subset to DT and HC
 campsub <- filter(camp, CMTE_NM =="HILLARY FOR AMERICA" | CMTE_NM =="DONALD J. TRUMP FOR PRESIDENT, INC.") %>% 
     filter(str_detect(RPT_TP, "M")) %>% 
     arrange(CMTE_NM, RPT_TP) %>% 
     select(CMTE_NM, RPT_TP, TTL_DISB_SUM_PAGE_PER) %>% 
     droplevels()
 
-knitr::kable(campsub)
-
-ggplot(campsub, aes(x=RPT_TP, y=TTL_DISB_SUM_PAGE_PER,
-                    group=CMTE_NM, colour=CMTE_NM)) + 
-    geom_line() + ylab("Total Disbursements") + 
-    xlab("Month")
+#change to month
+campsub$RPT_TP <- as.character(campsub$RPT_TP)
+campsub$RPT_TP[campsub$RPT_TP == "M2"] <- "Feb"
+campsub$RPT_TP[campsub$RPT_TP == "M3"] <- "Mar"
+campsub$RPT_TP[campsub$RPT_TP == "M4"] <- "Apr"
+campsub$RPT_TP[campsub$RPT_TP == "M5"] <- "May"
+campsub$RPT_TP[campsub$RPT_TP == "M6"] <- "Jun"
+campsub$RPT_TP[campsub$RPT_TP == "M7"] <- "Jul"
+campsub$RPT_TP[campsub$RPT_TP == "M8"] <- "Aug"
+campsub$RPT_TP[campsub$RPT_TP == "M9"] <- "Sep"
+campsub$RPT_TP[campsub$RPT_TP == "M10"] <- "Oct"
+campsub$RPT_TP <- factor(campsub$RPT_TP, level=
+                             c("Feb", "Mar", "Apr", "May", "Jun",
+                               "Jul", "Aug", "Sep", "Oct"))
 ```
 
-### PAC Data Initial Review
-
-This data set will require some effort to tidy and clean and normalize, including steps to summarize PACs by candidate, summarize expenditures by months, etc.
-
-We can see this quickly by attempting to simply review the values we will use to calculate our monthly sums. 
+#### Exploratory Campaign Data Plot
 
 ```{r}
+#plot
+ggplot(campsub, aes(x=RPT_TP, y=TTL_DISB_SUM_PAGE_PER,
+                    group=CMTE_NM, colour=CMTE_NM)) + 
+    geom_line() + ylab("Total Disbursements") + xlab("")
+```
+
+### PAC Data Prep
+
+#### Initial clean, subset of PAC data
+
+Below we will begin to clean, subset, and rename to find PACs associated with HRC and DJT, noting whether they support or oppose a candidate.
+
+```{r}
+# ready numeric vector
 pac$expenditure <- str_replace_all(as.character(pac$exp_amo), fixed("$"), "")
 pac$expenditure <- as.numeric(str_replace_all(pac$expenditure, ',', ''))
 
-summary(pac$expenditure)
+# droplevels
+pac$can_nam <- as.character(pac$can_nam)
+pac$can_nam <- tolower(pac$can_nam)
+pac$spe_nam <- tolower(pac$spe_nam)
+
+# subset only those that refer to HRC
+pacsubHC <- pac[grepl("inton|hil", pac$can_nam), ]
+pacsubHC <- pacsubHC[!grepl("kirk|james|george", pacsubHC$can_nam), ]
+pacsubHC$org[pacsubHC$sup_opp == "Oppose"] <- "HRC_Oppose"
+pacsubHC$org[pacsubHC$sup_opp == "Support"] <- "HRC_Support"
+
+# what's missing?
+rmhrc <- pacsubHC[!complete.cases(pacsubHC$org),]
+pacsubHC <- pacsubHC[complete.cases(pacsubHC$org),]
+rmhrc$org[rmhrc$can_par_aff == "Dem"] <- "HRC_Support"
+rmhrc <- rmhrc[complete.cases(rmhrc$org),]
+pacsubHC <- rbind(pacsubHC, rmhrc)
+
+# subset only those that refer to DJT
+pacsubDT <- pac[grepl("trump", pac$can_nam),]
+pacsubDT$org[pacsubDT$sup_opp == "Oppose"] <- "DJT_Oppose"
+pacsubDT$org[pacsubDT$sup_opp == "Support"] <- "DJT_Support"
+
+# what's missing?
+rmdjt <- pacsubDT[!complete.cases(pacsubDT$org),]
+pacsubDT <- pacsubDT[complete.cases(pacsubDT$org),]
+rmdjt$org[rmdjt$can_par_aff == "Rep"] <- "DJT_Support"
+rmdjt <- rmdjt[complete.cases(rmdjt$org),]
+pacsubDT <- rbind(pacsubDT, rmdjt)
+
+# combine, subset
+pacsub <- rbind(pacsubHC, pacsubDT)
+pacsub <- select(pacsub, org, spe_nam, rec_dat, expenditure)
+
+# clean type
+pacsub$org <- as.factor(pacsub$org)
+pacsub$spe_nam <- as.character(pacsub$spe_nam)
+pacsub$rec_dat <- as.Date(pacsub$rec_dat, "%m/%d/%Y")
+
+# remove obs < feb 2016 (same as campaign data summary)
+pacsub <- pacsub[pacsub$rec_dat >= "2016-02-01",]
+
+# create summary var for direction of effort
+pacsub$direction[pacsub$org =="DJT_Support" | pacsub$org =="HRC_Oppose"] <- "Trump"
+pacsub$direction[pacsub$org =="DJT_Oppose" | pacsub$org =="HRC_Support"] <- "Clinton"
+
+#clean house in RStudio env
+rm(pacsubHC); rm(pacsubDT); rm(rmdjt); rm(rmhrc)
 ```
 
+#### Exploring PAC Data
 
+```{r}
+ggplot(pacsub, aes(x=direction, y=expenditure, fill=org)) +
+    stat_summary(fun.y = sum, geom = "bar") + 
+    ylab("Total Disbursements") + xlab("") + 
+    ggtitle("Total Disbursements by Org Type") 
+
+length(unique(pacsub$spe_nam))
+```
+
+### Relevant summary statistics 
+
+**Provide summary statistics relevant to your research question. For example, if you’re comparing means across groups provide means, SDs, sample sizes of each group. This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
 
 ## Part 4 - Inference:
 

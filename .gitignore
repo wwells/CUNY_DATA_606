@@ -1,7 +1,7 @@
 .DS_Store
 606PREP/
 *.html
-*.css
+lab.css
 *more/
 .Rhistory
 *rsconnect/

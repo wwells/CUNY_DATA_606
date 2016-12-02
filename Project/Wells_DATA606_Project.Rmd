@@ -115,10 +115,9 @@ campsub$RPT_TP <- factor(campsub$RPT_TP, level=
                                "Jul", "Aug", "Sep", "Oct"))
 ```
 
-#### Exploratory Campaign Data Plot
+#### Exploring Campaign Data
 
 ```{r}
-#plot
 ggplot(campsub, aes(x=RPT_TP, y=TTL_DISB_SUM_PAGE_PER,
                     group=CMTE_NM, colour=CMTE_NM)) + 
     geom_line() + ylab("Total Disbursements") + xlab("")
@@ -195,6 +194,8 @@ ggplot(pacsub, aes(x=direction, y=expenditure, fill=org)) +
 
 length(unique(pacsub$spe_nam))
 ```
+
+While we see there about 305 unique Super PACs associated with HRC and DJT, apparently many of them cannot spell or use multiple submitters to send reports to the FEC.   There are a number of duplicate records in here, but a quick scan suggests maybe 20-40 are dupes.   Cleaning this field is beyond the scope of this project. 
 
 ### Relevant summary statistics 
 

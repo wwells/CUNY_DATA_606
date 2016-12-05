@@ -1,5 +1,6 @@
 ---
 title: 'DATA 606:  Final Project'
+subtitle: '2016 Presidential Campaign Expenditures'
 author: "Walt Wells, Fall 2016"
 output:
   html_document:

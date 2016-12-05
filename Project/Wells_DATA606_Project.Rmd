@@ -15,7 +15,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Part 1 - Introduction:
+## Part 1 - Introduction
 
 ### Research question 
 
@@ -27,9 +27,8 @@ The summary stats by month for each campaign are already available.  We will tid
 
 Our goal is to compare monthly expenditures for the campaign and for PACs across the two candidates.   We will further attempt to use the "sup_opp" variable in the PAC data to divide PAC expenditures across "negative" or "positive" efforts. 
 
-__NOTE:__   Before the project is due, there should be another month release of the data.   We will update our collected dataset accordingly.   The data cleaning methods we build are expected to work well with new observations.   Three cheers for reproduceable research!
+We will attempt to determine if there is a difference in average monthly expenditure across the 6 categories.  
 
-__NOTE2:__ A secondary study I may choose to conduct will be to further explore PAC data by the "pur" or "purpose of expenditure" category and review what PACs were spending their money on.   This would require some superior data cleaning efforts, as this var currently has 1362 levels with items as varied as "Robocalls" and "Taxi from event".   
 
 ### Environment Prep
 
@@ -37,9 +36,10 @@ __NOTE2:__ A secondary study I may choose to conduct will be to further explore 
 if (!require('dplyr')) install.packages('dplyr')
 if (!require('stringr')) install.packages('stringr')
 if (!require('ggplot2')) install.packages('ggplot2')
+if (!require('DT')) install.packages('DT')
 ```
 
-## Part 2 - Data:
+## Part 2 - Data
 
 ```{r, cache=TRUE}
 # load data
@@ -47,16 +47,13 @@ camp <- read.csv("FEC_campaign_summary.csv")
 pac <- read.csv("FEC_independent-expenditure.csv")
 ```
 
-
 ### Cases 
 
-In our raw data, there are of the campaign `r nrow(camp)` data and `r nrow(pac)` of the PAC data.  
+In our raw data, there are `r nrow(camp)` observations of the campaign data and `r nrow(pac)` of the PAC data.  
 
-Really, we'll only want the monthly observations for our two candidates so once the data is cleaned and merged into a long format dataset, I would expect the number of cases = n months * 6, where 6 represents ClintonCampaign, ProClintonPAC, AntiClintonPAC, TrumpCampaign, ProTrumpPAC, AntiTrumpPAC. 
+To effectively conduct our analysis, we'll only want the monthly observations for our two candidates so once the data is cleaned and merged into a long format dataset, I would expect the number of cases = n months * 6, where 6 represents ClintonCampaign, ProClintonPAC, AntiClintonPAC, TrumpCampaign, ProTrumpPAC, AntiTrumpPAC. 
 
 ### Data collection 
-
-**Describe the method of data collection.**
 
 The data is delivered to the FEC and redistributed to the public as part of disclosure law. 
 
@@ -64,30 +61,21 @@ The data is delivered to the FEC and redistributed to the public as part of disc
 
 ### Type of study 
 
-**What type of study is this (observational/experiment)?**
-
 This is an observational data study.
 
 ### Data Source 
-
-**If you collected the data, state self-collected. If not, provide a citation/link.**
 
 Data is source from is publicly available datasets from the [Federal Election Commission](http://fec.gov/about.shtml).   The data we will examine includes summary data on the 2016 US Presidential election from both the [campaigns](http://fec.gov/disclosurep/PDownload.do?candId=P00000001&electionYr=2016&candNmTitle=All%20Candidates&downloadComeFrom=pNational) and [independant groups or PACs](http://www.fec.gov/data/IndependentExpenditure.do?format=html&cf=superPAC).
 
 ### Response 
 
-**What is the response variable, and what type is it (numerical/categorical)?**
-
 The response variable will be the expenditure by the month.   This will be a numerical variable. 
 
 ### Explanatory 
 
-**What is the explanatory variable, and what type is it (numerical/categorival)?**
+We have a few explanatory variables: candidate + campaign/PAC type (Categorical) and month (Categorical).   
 
-We expect to have a few explanatory variables, candidate (Categorical), whether it is campaign or PAC (Categorical), and month (Categorical).   As we delve deeper, we may wish to add a few additional variables.
-
-
-## Part 3 - Exploratory data analysis:
+## Part 3 - Exploratory data analysis
 
 ### Campaign Data Prep
 
@@ -98,6 +86,11 @@ campsub <- filter(camp, CMTE_NM =="HILLARY FOR AMERICA" | CMTE_NM =="DONALD J. T
     arrange(CMTE_NM, RPT_TP) %>% 
     select(CMTE_NM, RPT_TP, TTL_DISB_SUM_PAGE_PER) %>% 
     droplevels()
+
+#change vars
+campsub$CMTE_NM <- as.character(campsub$CMTE_NM)
+campsub$CMTE_NM[campsub$CMTE_NM == "HILLARY FOR AMERICA"] <- "HRCCamp"
+campsub$CMTE_NM[campsub$CMTE_NM == "DONALD J. TRUMP FOR PRESIDENT, INC."] <- "DJTCamp"
 
 #change to month
 campsub$RPT_TP <- as.character(campsub$RPT_TP)
@@ -113,6 +106,9 @@ campsub$RPT_TP[campsub$RPT_TP == "M10"] <- "Oct"
 campsub$RPT_TP <- factor(campsub$RPT_TP, level=
                              c("Feb", "Mar", "Apr", "May", "Jun",
                                "Jul", "Aug", "Sep", "Oct"))
+
+campsub$direction[campsub$CMTE_NM =="DJTCamp"] <- "Trump"
+campsub$direction[campsub$CMTE_NM =="HRCCamp"] <- "Clinton"
 ```
 
 #### Exploring Campaign Data
@@ -120,7 +116,8 @@ campsub$RPT_TP <- factor(campsub$RPT_TP, level=
 ```{r}
 ggplot(campsub, aes(x=RPT_TP, y=TTL_DISB_SUM_PAGE_PER,
                     group=CMTE_NM, colour=CMTE_NM)) + 
-    geom_line() + ylab("Total Disbursements") + xlab("")
+    geom_line() + ylab("Disbursements") + xlab("") +
+    ggtitle("Total Disbursements by Campaigns") 
 ```
 
 ### PAC Data Prep
@@ -133,6 +130,10 @@ Below we will begin to clean, subset, and rename to find PACs associated with HR
 # ready numeric vector
 pac$expenditure <- str_replace_all(as.character(pac$exp_amo), fixed("$"), "")
 pac$expenditure <- as.numeric(str_replace_all(pac$expenditure, ',', ''))
+
+# there are dupes if we leave in amn_ind (amended filing) vars, let's remove them.  while imprecise, just reviewing the original filing will give us what we need for this study.
+
+pac <- pac[pac$amn_ind == "N",]
 
 # droplevels
 pac$can_nam <- as.character(pac$can_nam)
@@ -173,43 +174,164 @@ pacsub$org <- as.factor(pacsub$org)
 pacsub$spe_nam <- as.character(pacsub$spe_nam)
 pacsub$rec_dat <- as.Date(pacsub$rec_dat, "%m/%d/%Y")
 
-# remove obs < feb 2016 (same as campaign data summary)
-pacsub <- pacsub[pacsub$rec_dat >= "2016-02-01",]
+# remove obs < feb 2016 > nov (same as campaign data summary)
+pacsub <- pacsub[pacsub$rec_dat >= "2016-02-01" & pacsub$rec_dat < "2016-11-01",]
 
-# create summary var for direction of effort
-pacsub$direction[pacsub$org =="DJT_Support" | pacsub$org =="HRC_Oppose"] <- "Trump"
-pacsub$direction[pacsub$org =="DJT_Oppose" | pacsub$org =="HRC_Support"] <- "Clinton"
-
-#clean house in RStudio env
-rm(pacsubHC); rm(pacsubDT); rm(rmdjt); rm(rmhrc)
+#clean house 
+rm(pacsubHC, pacsubDT, rmdjt, rmhrc)
 ```
 
 #### Exploring PAC Data
 
 ```{r}
-ggplot(pacsub, aes(x=direction, y=expenditure, fill=org)) +
-    stat_summary(fun.y = sum, geom = "bar") + 
-    ylab("Total Disbursements") + xlab("") + 
-    ggtitle("Total Disbursements by Org Type") 
-
 length(unique(pacsub$spe_nam))
 ```
 
-While we see there about 305 unique Super PACs associated with HRC and DJT, apparently many of them cannot spell or use multiple submitters to send reports to the FEC.   There are a number of duplicate records in here, but a quick scan suggests maybe 20-40 are dupes.   Cleaning this field is beyond the scope of this project. 
+While we see there about `r length(unique(pacsub$spe_nam))` unique Super PACs associated with HRC and DJT, apparently many of them use multiple submitting parties (who can't spell) to send reports to the FEC.   There are a number of duplicate records in here, but a quick scan suggests maybe 20-40 are dupes.   Cleaning this field is beyond the scope of this project. 
 
-### Relevant summary statistics 
+##### Prep PAC Month
 
-**Provide summary statistics relevant to your research question. For example, if you’re comparing means across groups provide means, SDs, sample sizes of each group. This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+```{r}
+pacsub$month[pacsub$rec_dat >= "2016/02/01" & pacsub$rec_dat < "2016/03/01"] <- "Feb"
+pacsub$month[pacsub$rec_dat >= "2016/03/01" & pacsub$rec_dat < "2016/04/01"] <- "Mar"
+pacsub$month[pacsub$rec_dat >= "2016/04/01" & pacsub$rec_dat < "2016/05/01"] <- "Apr"
+pacsub$month[pacsub$rec_dat >= "2016/05/01" & pacsub$rec_dat < "2016/06/01"] <- "May"
+pacsub$month[pacsub$rec_dat >= "2016/06/01" & pacsub$rec_dat < "2016/07/01"] <- "Jun"
+pacsub$month[pacsub$rec_dat >= "2016/07/01" & pacsub$rec_dat < "2016/08/01"] <- "Jul"
+pacsub$month[pacsub$rec_dat >= "2016/08/01" & pacsub$rec_dat < "2016/09/01"] <- "Aug"
+pacsub$month[pacsub$rec_dat >= "2016/09/01" & pacsub$rec_dat < "2016/10/01"] <- "Sep"
+pacsub$month[pacsub$rec_dat >= "2016/10/01" & pacsub$rec_dat < "2016/11/01"] <- "Oct"
+```
 
-## Part 4 - Inference:
+##### Prep PAC Totals
 
+```{r}
+HRCOp <- pacsub[pacsub$org=="HRC_Oppose", ]
+DJTOp <- pacsub[pacsub$org=="DJT_Oppose", ]
+HRCSu <- pacsub[pacsub$org=="HRC_Support", ]
+DJTSu <- pacsub[pacsub$org=="DJT_Support", ]
 
-## Part 5 - Conclusion: 
+monthsum <- function(df){
+    df %>% 
+        group_by(month) %>% 
+        summarize(sum(expenditure))
+}
 
+HOp <- monthsum(HRCOp)
+DOp <- monthsum(DJTOp)
+HSu <- monthsum(HRCSu)
+DSu <- monthsum(DJTSu)
 
-## References:
+HOp$org <- "HRC_Oppose"
+DOp$org <- "DJT_Oppose"
+HSu$org <- "HRC_Support"
+DSu$org <- "DJT_Support"
 
+pacsummary <- rbind(HOp, DOp, HSu, DSu)
+pacsummary$month <- factor(pacsummary$month, level=
+                             c("Feb", "Mar", "Apr", "May", "Jun",
+                               "Jul", "Aug", "Sep", "Oct"))
+names(pacsummary) <- c("RPT_TP", "TTL_DISB_SUM_PAGE_PER", "CMTE_NM")
+pacsummary <- pacsummary[,c(3,1,2)]
+# create summary var for direction of effort
+pacsummary$direction[pacsummary$CMTE_NM =="DJT_Support" | pacsummary$CMTE_NM =="HRC_Oppose"] <- "Trump"
+pacsummary$direction[pacsummary$CMTE_NM =="DJT_Oppose" | pacsummary$CMTE_NM =="HRC_Support"] <- "Clinton"
 
-## Appendix (optional):
+rm(HOp, DOp, HSu, DSu, HRCOp, DJTOp, HRCSu)
+```
 
-Remove this section if you don't have an appendix
+#### Exploring PAC Summary Data
+
+```{r, warning=FALSE}
+ggplot(pacsummary, aes(x=RPT_TP, y=TTL_DISB_SUM_PAGE_PER,
+                    group=CMTE_NM, colour=CMTE_NM)) + 
+    geom_line() + ylab("Disbursements") + xlab("") +
+    ggtitle("Total Disbursements by PACS") 
+
+# why are June expenditures so high for Trump supporting PACs?
+review <- DJTSu[DJTSu$month=="Jun",]
+review <- review[order(-review$expenditure),]
+datatable(review, options=list(pageLength=5))
+
+# what was this $50mil expenditure from Jun 14?
+whatonearth <- pac[pac$expenditure==50000000,]
+whatonearth <- select(whatonearth, spe_nam, pur, pay, exp_amo)
+knitr::kable(whatonearth)
+
+rm(DJTSu, review, whatonearth)
+```
+
+Ok, this is quite something.   This is a very very strange outlier.   More information on this particular observation can be found [here](http://www.politico.com/story/2016/06/convicted-ponzi-schemer-ill-conduct-50-million-marketing-campaign-for-trump-224350).  We should leave this in, but note it is an outlier likely to skew statistical analysis.   
+
+#### Combine all
+
+```{r}
+final <- rbind(pacsummary, campsub)
+names(final) <- c("category", "month", "expenditure", "direction")
+final$category <- as.factor(final$category)
+final$direction <- as.factor(final$direction)
+
+ggplot(final, aes(x=month, y=expenditure,
+                    group=category, colour=category)) + 
+    geom_line() + ylab("Disbursements") + xlab("") +
+    ggtitle("Total Disbursements by Campaigns and PACs") 
+
+ggplot(final, aes(x=direction, y=expenditure, fill=category)) +
+    geom_bar(position="dodge", stat="identity") + 
+    ylab("Total Disbursements") + xlab("") + 
+    ggtitle("Total Disbursements by Org Type") 
+```
+
+## Part 4 - Inference
+
+### Hypothesis
+
+$H_0: \mu_{TCamp} = \mu_{HCamp} = \mu_{TPACOp} = \mu_{HPACOp} = \mu_{TPACSu} = \mu_{HPACSu}$.  The avg monthly expenditures does not vary across all types.
+
+$H_A:$ The avg monthly expenditures across some or all groups does vary.
+
+### Check Conditions
+
+```{r}
+ggplot(final, aes(factor(category), expenditure)) + geom_boxplot(aes(fill=category)) + xlab("") +  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+
+finalsum <- group_by(final, category) 
+finalsum2 <- summarise(finalsum, mean = round(mean(expenditure),0), stdev = round(sd(expenditure), 0))
+knitr::kable(finalsum2)
+```
+
+We believe the data from each category is independant (it is unlikely that a similar expenditure shows up in each category).   We also estimate that while the variability and distributions are not ideal, they should also be adequate for conducting a simple ANOVA test. 
+
+#### ANOVA
+
+```{r}
+anova <- aov(final$expenditure ~ final$category)
+summary(anova)
+tukey <- TukeyHSD(anova, ordered=TRUE)
+tukey
+```
+
+We can see from our test that the p value is extremely low = `r summary(anova)[[1]][["Pr(>F)"]][1]`.   This causes us to reject $H_0$ and conclude that there are some differences in monthly expenditures across categories.  
+
+To help determine where the biggest differences in mean might be occurring, we conducted a Tukey range test.  The lowest 'p adj' values indicate the biggest difference in mean and often refer to the Clinton Campaign (HRCCamp) and any of the PAC groups.  
+
+## Part 5 - Conclusion
+
+Our study of the 2016 presidential election campaign revealed a bit about the nature of expenditures related to the two major party candidates.   We looked at subgroups representing the campaigns and PACs that spent to either support or oppose a candidate.  
+
+The majority of our lessons learned about the nuances of the data came from our exploratory data preparation process.  Finding outliers like the $50mil donation caused us to find additional duplicates (amended records), learn more about the many things that could be considered a campaign expenditure, and illuminate the inconsistent nature of the self-reported data.  
+
+We set out to show expenditures across PACs and campaigns and determine whether there are differences in the average monthly expenditures for each group type we reviewed.   Using ANOVA and a Tukey test were able to determine which means were most alike and which were most different.  
+
+A few other approaches that could be used to analyze the same problem include:
+
+* Conducting a similar analysis after using a normalization technique to flatten the values so that we're looking at a ratio each month instead of summary dollar value. 
+* Pulling full campaign expenditure data instead of summary data, and conducting a similar ANOVA test to determine if the mean of expenditures overall were similar across group types. 
+
+## References
+
+* [Using AOV and TukeyHSD in R](https://www.youtube.com/watch?v=Dwd3ha0P8uw)
+* [Tukey Range Test](https://en.wikipedia.org/wiki/Tukey's_range_test)
+
